@@ -1,0 +1,82 @@
+target-version = "py310"
+fix = true
+line-length = 79
+indent-width = 4
+
+[lint]
+select = [
+    "E",        # pycodestyle errors
+    "W",        # pycodestyle warnings
+    "F",        # pyflakes
+    "I",        # isort
+    "B",        # flake8-bugbear
+    "C4",       # flake8-comprehensions list/set/dict
+    "UP",       # pyupgrade
+    "ARG",      # flake8-unused-arguments
+    "SIM",      # flake8-simplify
+    'S',        # security
+    'F',        # flake8
+    'PIE',      # improving code quality and readability
+    'A',        # builtin names used
+    'E',        # errors
+    'W',        # warnings
+    'TID',      # tidier imports
+    'TCH',      # imports for type checking
+    'N',        # naming
+    'D419',     # doc style
+    'DJ',       # django
+    'ICN',      # import conventions
+    'ASYNC',    # async
+    'T20',      # found print
+    'PT',       # pytest style
+    'RSE',      # Unnecessary parentheses on raised exception
+    'RET',      # checks returns
+    'TD',       # todos comments
+    'FIX',      # fix me comments
+]
+extend-ignore = [
+    'A003',
+    'UP031',    # Use format specifiers instead of percent format
+    'S101',     # Use of `assert` detected
+    'W293',     # Blank line contains whitespace
+    'S105',     # Possible hardcoded password assigned
+    'S106',     # Possible hardcoded password assigned
+    'S107',     # Possible hardcoded password assigned
+    'F841',     # Remove assignment to unused variable
+    'N818',     # Check exception names
+    'ARG002',   # Unused method argument
+    'ARG005',   # Unused lambda argument
+    # 'SIM117',   # Use a single with statement
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "B904",  # raise from
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+"tests/*" = ["B011", "ARG001"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[lint.isort]
+known-first-party = ["requestforge"]
+from-first = true
+length-sort = true
+order-by-type = true
+case-sensitive = true
+force-wrap-aliases = true
+combine-as-imports = true
+detect-same-package = true
+length-sort-straight = true
+split-on-trailing-comma = true
+force-sort-within-sections = true
+lines-after-imports = 2
+no-lines-before = ['future', ]
+known-third-party = ['pytest']
+section-order = ['future', 'standard-library', 'third-party', "first-party", 'local-folder']
