@@ -1,0 +1,96 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      - name: Run ruff check
+        run: ruff check src/ tests/
+
+      - name: Run ruff format check
+        run: ruff format --check src/ tests/
+
+      - name: Run mypy
+        run: |
+          pip install -e ".[dev]"
+          mypy src/requestforge
+
+  test:
+    name: Test (Python ${{ matrix.python-version }}, requests ${{ matrix.requests-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        requests-version: ["2.31.0", "2.32.0"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests==${{ matrix.requests-version }}
+          pip install pytest pytest-cov pytest-mock responses
+
+      - name: Install package
+        run: pip install -e .
+
+      - name: Run tests
+        run: pytest --cov=requestforge --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: matrix.python-version == '3.12' && matrix.requests-version == '2.32.0'
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  test-tox:
+    name: Test with Tox
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: |
+            3.10
+            3.11
+            3.12
+            3.13
+
+      - name: Install tox
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run tox
+        run: tox -p auto
